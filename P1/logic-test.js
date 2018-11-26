@@ -75,44 +75,123 @@ function listTeamsIds () {
 
 // 1 Arreglo con los nombres de los equipos y el país al que pertenecen, ordenados alfabéticamente por el nombre de su país de origen.
 function listTeamsByCountry () {
-  // CODE HERE
+    return teams.map((item) => {
+        return {
+          'team': item.name,
+          'country': item.country
+        }
+    }).sort((a, b) => { return a.country < b.country ? -1 : a.country > b.country ? 1 : 0; });
 }
 
 // 2 Arreglo con los nombres de los equipos ordenados de mayor a menor por la cantidad de victorias en champions league.
 function sortTeamsByWins () {
-  // CODE HERE
+    return teams.map((team) => {
+        for (let i in winsByTeams) {
+          if (winsByTeams[i].teamId === team.id) {
+              team.wins = winsByTeams[i].wins;
+          }
+        }
+        return {
+          'name': team.name,
+          'wins': team.wins,
+        }
+    }).sort((a, b) => { return b.wins - a.wins }).map(team => team.name);
 }
-
+/*
+Devolver total de victorias de equipos de la liga
+ */
+function totalWinsLeaguesFromTeams (league) {
+    let wins = 0;
+    for (let i in teamsByLeague) {
+        if (teamsByLeague[i].leagueId === league.id) {
+            wins += winsByTeams.find((wins) => wins.teamId === teamsByLeague[i].teamId).wins;
+        }
+    }
+    return wins;
+}
 // 3 Arreglo de objetos en donde se muestre el nombre de las ligas y la sumatoria de las victorias de los equipos que pertenecen a ellas.
 function leaguesWithWins () {
-  // CODE HERE
+  return leagues.map((league) => {
+    return {
+      'league': league.name,
+      'wins': totalWinsLeaguesFromTeams(league)
+    }
+  });
+}
+/*
+Devolver la liga con sus equipos y triunfos
+ */
+function teamsWinsFromLeagues (league) {
+    let wins = [];
+    for (let i in teamsByLeague) {
+        if (teamsByLeague[i].leagueId === league.id) {
+            wins.push({
+                team: teams.find(team => team.id === teamsByLeague[i].teamId).name,
+                wins: winsByTeams.find((wins) => wins.teamId === teamsByLeague[i].teamId).wins
+            });
+        }
+    }
+    return wins
 }
 
 // 4 Objeto en que las claves sean los nombres de las ligas y los valores el nombre del equipo con la menor cantidad de victorias en champions.
 function leaguesWithTeamWithLestWins () {
-  // CODE HERE
+  return leagues.map((league) => {
+    return {
+      [league.name] : teamsWinsFromLeagues(league).sort(((a, b) => {return b.wins - a.wins})).pop()
+    };
+  });
 }
 
 // 5 Objeto en que las claves sean los nombres de las ligas y los valores el nombre del equipo con la mayor cantidad de victorias en champions.
 function leaguesWithTeamWithMostWins () {
-  // CODE HERE
+    return leagues.map((league) => {
+        return {
+            [league.name] : teamsWinsFromLeagues(league).sort(((a, b) => {return a.wins - b.wins})).pop()
+        };
+    });
 }
 
 // 6 Arreglo con los nombres de las ligas ordenadas de mayor a menor por la cantidad de victorias de sus equipos.
 function sortLeaguesByTeamsByWins () {
-  // CODE HERE
+    return leaguesWithWins().sort((a, b) => b.wins - a.wins).map(league => league.league);
 }
 
 // 7 Arreglo con los nombres de las ligas ordenadas de mayor a menor por la cantidad de equipos que participan en ellas.
 function sortLeaguesByTeams () {
-  // CODE HERE
+    return leagues.map((league) => {
+        return {
+          name: league.name,
+          teams: teamsWinsFromLeagues(league).map(teams => teams.team)
+        };
+    }).sort((a, b) => { return b.teams.length - a.teams.length}).map(league => league.name)
 }
 
 // 8 Agregar un nuevo equipo con datos ficticios a "teams", asociarlo a la liga de Francia y agregar un total de 4 victorias en champions.
 // Luego devolver el lugar que ocupa este equipo en el ranking de la pregunta 2.
 // No modificar arreglos originales para no alterar las respuestas anteriores al correr la solución
 function newTeamRanking () {
-  // CODE HERE
+  let newTeam = {'name': 'Marsella', 'country': 'France'};
+  let league = 7;
+  let wins = 4;
+  let ranking  = sortTeamsByWins();
+  team = addNewTeam(newTeam, league, wins);
+  return ranking;
+}
+
+/*
+Agregar un nuevo equipo, asociar al team y sus triunfos
+ */
+function addNewTeam(team, league, wins) {
+  let savedTeam;
+  let lastIdTeams = teams.sort().pop();
+  team.id = lastIdTeams.id + 1;
+  teams.push(team);
+  savedTeam = teams.find(a => a.name === team.name);
+  teamsByLeague.push({teamId: savedTeam.id, leagueId: league});
+  winsByTeams.push({teamId: savedTeam.id, wins: wins});
+  console.log(savedTeam);
+  return teams
 }
 
 // 9 Realice una función que retorne una promesa con los nombres de los equipos en upper case.
@@ -123,10 +202,20 @@ function newTeamRanking () {
 async function getTeamsNamesAsUpperCase () {
   let response
   // ------MAKE AWAIT CALL HERE------
-
+  response = await setTeamsNamesToUpper();
   // --------------------------------
   console.log('response:')
   console.log(response)
+}
+
+async function setTeamsNamesToUpper () {
+  return new Promise((resolve, eject)  => {
+    if (teams.length) {
+      resolve(teams.map(team => team.name.toUpperCase()));
+    } else {
+      eject(Error('Not found teams'))
+    }
+  });
 }
 
 // Impresión de soluciones. No modificar.
