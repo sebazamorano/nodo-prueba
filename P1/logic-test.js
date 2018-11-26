@@ -174,9 +174,9 @@ function newTeamRanking () {
   let newTeam = {'name': 'Marsella', 'country': 'France'};
   let league = 7;
   let wins = 4;
-  let ranking  = sortTeamsByWins();
-  team = addNewTeam(newTeam, league, wins);
-  return ranking;
+
+  addNewTeam(newTeam, league, wins);
+  return sortTeamsByWins().indexOf(newTeam.name) + 1;
 }
 
 /*
@@ -185,13 +185,15 @@ Agregar un nuevo equipo, asociar al team y sus triunfos
 function addNewTeam(team, league, wins) {
   let savedTeam;
   let lastIdTeams = teams.sort().pop();
+
   team.id = lastIdTeams.id + 1;
   teams.push(team);
+
   savedTeam = teams.find(a => a.name === team.name);
   teamsByLeague.push({teamId: savedTeam.id, leagueId: league});
   winsByTeams.push({teamId: savedTeam.id, wins: wins});
-  console.log(savedTeam);
-  return teams
+
+  return savedTeam
 }
 
 // 9 Realice una función que retorne una promesa con los nombres de los equipos en upper case.
