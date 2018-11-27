@@ -1,20 +1,22 @@
 <template>
-  <div>
-    <h1 v-show="isLoading">
-      Cargando personajes ...
-    </h1>
-    <table v-show="!isLoading">
-      <tr>
-        <th>Nombre</th>
-        <th>Casa</th>
-        <th>Detalle</th>
-      </tr>
-      <tr v-for="character in characters">
-        <td>{{ character.name }}</td>
-        <td>{{ character.house }}</td>
-        <td> <button @click="goToDetail(character._id)">Ver detalle</button> </td>
-      </tr>
-    </table>
+  <div class="container">
+    <div class="row">
+      <h1 v-show="isLoading">
+        Cargando personajes ...
+      </h1>
+      <table class="table table-bordered" v-show="!isLoading">
+        <tr>
+          <th>Nombre</th>
+          <th>Casa</th>
+          <th>Detalle</th>
+        </tr>
+        <tr v-for="character in characters">
+          <td>{{ character.name }}</td>
+          <td>{{ character.house }}</td>
+          <td> <button class="btn btn-success" @click="goToDetail(character._id)">Ver detalle</button> </td>
+        </tr>
+      </table>
+    </div>
   </div>
 </template>
 
@@ -58,12 +60,13 @@
        * @method goToDetail
        */
       goToDetail(id) {
-        // CODE HERE
+        this.$router.push({name: 'viewCharacter', params: {'id': id}})
       }
     }
   }
 </script>
-<style>
+<style lang="scss">
+  @import "../assets/app.scss";
   table {
     font-family: arial, sans-serif;
     border-collapse: collapse;
