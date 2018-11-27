@@ -1,5 +1,5 @@
 import List from './components/List.vue'
-import ViewCharacter from './components/ViewCharacter'
+import ViewCharacter from './components/Detail'
 
 /*
 	array of all global routes of the proyect, in  here we asociated all the components with his routes.
